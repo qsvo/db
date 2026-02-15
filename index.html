@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CloseDB Storage Hub</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,Helvetica,sans-serif}
+
+body{
+height:100vh;
+overflow-x:hidden;
+background:linear-gradient(-45deg,#0f2027,#203a43,#2c5364,#1a2a6c);
+background-size:400% 400%;
+animation:gradientMove 12s ease infinite;
+color:white;
+text-align:center;
+}
+
+@keyframes gradientMove{
+0%{background-position:0% 50%}
+50%{background-position:100% 50%}
+100%{background-position:0% 50%}
+}
+
+header{
+padding:40px 20px;
+}
+
+h1{
+font-size:42px;
+margin-bottom:10px;
+letter-spacing:2px;
+}
+
+.typing{
+border-right:3px solid white;
+white-space:nowrap;
+overflow:hidden;
+width:0;
+animation:typing 4s steps(30,end) forwards,
+blink .7s infinite;
+}
+
+@keyframes typing{
+from{width:0}
+to{width:100%}
+}
+
+@keyframes blink{
+0%,100%{border-color:transparent}
+50%{border-color:white}
+}
+
+.container{
+display:flex;
+flex-wrap:wrap;
+justify-content:center;
+gap:40px;
+margin-top:30px;
+padding-bottom:60px;
+}
+
+.card{
+background:rgba(255,255,255,0.08);
+padding:25px;
+width:320px;
+border-radius:20px;
+backdrop-filter:blur(12px);
+box-shadow:0 0 25px rgba(0,0,0,0.4);
+transition:.3s;
+}
+
+.card:hover{
+transform:translateY(-10px);
+box-shadow:0 0 35px rgba(255,255,255,0.4);
+}
+
+button{
+padding:12px 22px;
+margin-top:15px;
+border:none;
+border-radius:10px;
+cursor:pointer;
+font-weight:bold;
+font-size:15px;
+}
+
+#clickBtn{
+background:#00f2fe;
+color:black;
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(4,65px);
+gap:10px;
+justify-content:center;
+margin-top:15px;
+}
+
+.cell{
+width:65px;
+height:65px;
+background:#111;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:24px;
+cursor:pointer;
+border-radius:12px;
+transition:.3s;
+}
+
+.revealed{
+background:#00f2fe;
+color:black;
+}
+
+footer{
+position:fixed;
+bottom:10px;
+width:100%;
+font-size:14px;
+opacity:0.6;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>CloseDB</h1>
+<h2 class="typing">Public Storage Repository</h2>
+</header>
+
+<div class="container">
+
+<div class="card">
+<h3>Click Speed Test</h3>
+<p>Click as fast as possible in 5 seconds</p>
+<button id="clickBtn">Start</button>
+<p id="score">Score: 0</p>
+</div>
+
+<div class="card">
+<h3>Memory Flip Game</h3>
+<div class="grid" id="grid"></div>
+</div>
+
+</div>
+
+<footer>
+CloseDB Public Repository
+</footer>
+
+<script>
+let score=0;
+let playing=false;
+let timer;
+
+document.getElementById("clickBtn").onclick=function(){
+if(!playing){
+score=0;
+playing=true;
+this.innerText="Click!";
+document.getElementById("score").innerText="Score: 0";
+timer=setTimeout(()=>{
+playing=false;
+this.innerText="Start";
+alert("Time up! Your score: "+score);
+},5000);
+}else{
+score++;
+document.getElementById("score").innerText="Score: "+score;
+}
+};
+
+const emojis=["A","A","B","B","C","C","D","D"];
+let shuffled=emojis.sort(()=>0.5-Math.random());
+let grid=document.getElementById("grid");
+let first=null,second=null,lock=false;
+
+shuffled.forEach(symbol=>{
+let div=document.createElement("div");
+div.classList.add("cell");
+div.dataset.symbol=symbol;
+div.onclick=function(){
+if(lock||this.classList.contains("revealed"))return;
+this.innerText=symbol;
+this.classList.add("revealed");
+
+if(!first){
+first=this;
+}else{
+second=this;
+lock=true;
+if(first.dataset.symbol===second.dataset.symbol){
+first=null;second=null;lock=false;
+}else{
+setTimeout(()=>{
+first.innerText="";
+second.innerText="";
+first.classList.remove("revealed");
+second.classList.remove("revealed");
+first=null;second=null;lock=false;
+},800);
+}
+}
+};
+grid.appendChild(div);
+});
+</script>
+
+</body>
+</html>
